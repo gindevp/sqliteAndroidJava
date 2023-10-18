@@ -12,9 +12,10 @@ import java.util.List;
 public class ContactDataSource {
     private SQLiteDatabase database;
     private DatabaseHelper dbHelper;
+    private String[][] columns = {{"name", "TEXT"}, {"phone", "TEXT"}};
 
     public ContactDataSource(Context context) {
-        dbHelper = new DatabaseHelper(context);
+        dbHelper = new DatabaseHelper(context,"contacts.db",1,"contacts",columns);
     }
 
     public void open() throws SQLException {
@@ -27,16 +28,16 @@ public class ContactDataSource {
 
     public void addContact(Contact contact) {
         ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COLUMN_NAME, contact.getName());
-        values.put(DatabaseHelper.COLUMN_PHONE, contact.getPhone());
+        values.put("name", contact.getName());
+        values.put("phone", contact.getPhone());
 
-        database.insert(DatabaseHelper.TABLE_CONTACTS, null, values);
+        database.insert("contacts", null, values);
     }
 
     public List<Contact> getAllContacts() {
         List<Contact> contacts = new ArrayList<>();
         Cursor cursor = database.query(
-                DatabaseHelper.TABLE_CONTACTS, null, null, null, null, null, null);
+                "contacts", null, null, null, null, null, null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -49,9 +50,9 @@ public class ContactDataSource {
     }
 
     private Contact cursorToContact(Cursor cursor) {
-        int idIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_ID);
-        int nameIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME);
-        int phoneIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PHONE);
+        int idIndex = cursor.getColumnIndex("id");
+        int nameIndex = cursor.getColumnIndex("name");
+        int phoneIndex = cursor.getColumnIndex("phone");
 
         int id = cursor.getInt(idIndex);
         String name = cursor.getString(nameIndex);
